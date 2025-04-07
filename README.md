@@ -7,8 +7,8 @@ UPDATE:
 25/3: Tạo thêm tính năng play again, chỉnh lại giao diện.
 
 3/4: Update thêm tính năng ẩn, map mới.
-     Thêm tính năng đếm số lượt chướng ngại vật đã qua.
-     Khi vượt qua 5 chướng ngại vật, người chơi sẽ được chuyển qua map mới, khi vượt qua 5 chướng ngại vật ở map mới, người chơi sẽ chiến thắng.
+     -Thêm tính năng đếm số lượt chướng ngại vật đã qua.
+     -Khi vượt qua 5 chướng ngại vật, người chơi sẽ được chuyển qua map mới, khi vượt qua 5 chướng ngại vật ở map mới, người chơi sẽ chiến thắng.
 
 7/4: Update đồ họa khủng long, chướng ngại vât, nền.
      Update hình ảnh khi thua, replay trò chơi, hình ảnh khi chiến thắng.
