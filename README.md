@@ -16,3 +16,5 @@ UPDATE:
 
 7/4: Update đồ họa khủng long, chướng ngại vât, nền.
      Update hình ảnh khi thua, replay trò chơi, hình ảnh khi chiến thắng.
+
+13/4 Upload bản hoàn thiện của game.
