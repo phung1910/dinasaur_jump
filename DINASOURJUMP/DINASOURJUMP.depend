@@ -854,8 +854,10 @@
 	"begin_code.h"
 	"close_code.h"
 
-1742876707 source:c:\dinasourjump\game.cpp
+1744422221 source:c:\dinasourjump\game.cpp
 	<SDL.h>
+	<SDL_image.h>
+	<SDL_ttf.h>
 	<iostream>
 	<vector>
 	<cstdlib>
