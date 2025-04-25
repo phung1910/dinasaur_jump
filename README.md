@@ -2,7 +2,12 @@ Vào năm 2120, khủng long đã được tái tạo lại và trở thành v�
 
 How to play:
 
-Trong trò chơi ban đầu, nhấn space để nhảy khi gặp chướng ngại vật (Lưu ý: Nên nhảy khi đến gần chướng ngại vật). Ở trò chơi 2 - Flappy dinasour , nhấn space liên tục để k bị rơi xuống, khi khủng long chạm đất sẽ thua. 
+Trong trò chơi DINAJUMP, nhấn space để nhảy khi gặp chướng ngại vật (Lưu ý: Nên nhảy khi đến gần chướng ngại vật). Ở trò chơi 2 - FLAPPY DINA , nhấn space liên tục để k bị rơi xuống, khi khủng long chạm đất sẽ thua. 
+
+CẤU TRÚC CHÍNH CỦA GAME:
+
+Nền của game DINAJUMP bắt đầu từ ground level, khủng long và chướng ngại vật sẽ có điểm bắt đầu bằng ground level. Khủng long sẽ có các chỉ số khởi đầu là chiều dài, chiều rộng, trọng lượng và độ cao cú nhảy, các chướng ngại vật sẽ có chiều cao và chiều rộng thay đổi ngẫu nhiên. Hoạt ảnh khủng long di chuyển được tạo nên từ 3 hình ảnh. Các làm hoạt ảnh được tham khảo từ video https://www.youtube.com/watch?v=BZaTNiJAHE4 . 
+
 
 UPDATE:
 
