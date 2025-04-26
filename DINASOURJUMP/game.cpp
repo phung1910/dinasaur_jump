@@ -5,13 +5,12 @@
 #include <vector>
 #include <cstdlib>
 #include <ctime>
-// tang kich thuoc , an vat pham.
+
 const int SCREEN_WIDTH = 1536 * 2 / 3;
 const int SCREEN_HEIGHT = 1024 * 2 / 3;
 const int GROUND_LEVEL = 500;
-const int DINO_WIDTH = 60;
-const int DINO_HEIGHT = 60;
-const float SCALE_FACTOR = 2.0f;
+const int INITIAL_DINO_WIDTH = 120;
+const int INITIAL_DINO_HEIGHT = 120;
 const float GRAVITY = 1;
 const float JUMP_FORCE = 25;
 const float FLAPPY_GRAVITY = 1;
@@ -27,6 +26,8 @@ SDL_Texture* flappyObstacleTexture = nullptr;
 SDL_Texture* gameOverTexture = nullptr;
 SDL_Texture* youWinTexture = nullptr;
 SDL_Texture* backgroundTexture = nullptr;
+SDL_Texture* growItemTexture = nullptr;
+SDL_Texture* shrinkItemTexture = nullptr;
 TTF_Font* font = nullptr;
 
 bool isRunning = true;
@@ -42,6 +43,8 @@ int frameCount = 0;
 int currentDinoFrame = 0;
 int dinoFrameTimer = 0;
 const int DINO_ANIMATION_SPEED = 10;
+float dinoWidth = INITIAL_DINO_WIDTH;
+float dinoHeight = INITIAL_DINO_HEIGHT;
 
 struct Obstacle {
     float x;
@@ -51,6 +54,16 @@ struct Obstacle {
     int gapHeight = 300;
 };
 std::vector<Obstacle> obstacles;
+
+struct Item {
+    float x;
+    int y;
+    int width = 40;
+    int height = 40;
+    bool isGrow;
+    bool collected = false;
+};
+std::vector<Item> items;
 
 SDL_Texture* loadTexture(const std::string& path) {
     SDL_Surface* surface = IMG_Load(path.c_str());
@@ -65,14 +78,28 @@ SDL_Texture* loadTexture(const std::string& path) {
 
 void spawnObstacle() {
     if (!isFlappyMode) {
-        int width = 35 + rand() % 20;
-        int height = 60 + rand() % 30;
+        int width = (35 + rand() % 20) * 2;
+        int height = (60 + rand() % 30) * 2;
         obstacles.push_back({static_cast<float>(SCREEN_WIDTH), width, height, false, 0});
     } else {
-        int width = 50;
-        int gapY = 100 + rand() % (SCREEN_HEIGHT - 250);
+        int width = 50 * 2;
+        int gapY = 100 + rand() % (SCREEN_HEIGHT - 400);
         obstacles.push_back({static_cast<float>(SCREEN_WIDTH), width, SCREEN_HEIGHT, false, gapY});
     }
+}
+
+void spawnItem() {
+    int y = 400 ;
+    bool isGrow = rand() % 2 == 0;
+    float itemX = static_cast<float>(SCREEN_WIDTH);
+    if (obstacles.size() >= 2) {
+        // Lấy hai chướng ngại vật cuối cùng
+        auto& obs1 = obstacles[obstacles.size() - 2]; // Chướng ngại vật trước
+        auto& obs2 = obstacles[obstacles.size() - 1]; // Chướng ngại vật sau
+        itemX = (obs1.x + obs1.width + obs2.x) / 2.0f; // Tọa độ x ở giữa
+    }
+
+    items.push_back({itemX, y, 40, 40, isGrow});
 }
 
 void restartGame() {
@@ -81,9 +108,12 @@ void restartGame() {
     dinoY = static_cast<float>(GROUND_LEVEL);
     velocityY = 0.0f;
     obstacles.clear();
+    items.clear();
     frameCount = 0;
     obstacleCount = 0;
     isFlappyMode = false;
+    dinoWidth = INITIAL_DINO_WIDTH;
+    dinoHeight = INITIAL_DINO_HEIGHT;
 }
 
 void handleEvents() {
@@ -121,17 +151,24 @@ void update(float deltaTime) {
     }
 
     for (auto& obs : obstacles) obs.x -= OBSTACLE_SPEED * deltaTime * 60.0f;
-    if (!obstacles.empty() && obstacles[0].x < -obstacles[0].width * SCALE_FACTOR) obstacles.erase(obstacles.begin());
+    if (!obstacles.empty() && obstacles[0].x < -obstacles[0].width) obstacles.erase(obstacles.begin());
+
+    for (auto& item : items) item.x -= OBSTACLE_SPEED * deltaTime * 60.0f;
+    if (!items.empty() && items[0].x < -items[0].width) items.erase(items.begin());
 
     for (auto& obs : obstacles) {
-        if (!obs.passed && obs.x + obs.width * SCALE_FACTOR < 100) {
+        if (!obs.passed && obs.x + obs.width < 100) {
             obs.passed = true;
             obstacleCount++;
+            if (!isFlappyMode && obstacleCount % 3 == 0) {
+                spawnItem();
+            }
             if (!isFlappyMode && obstacleCount == 5) {
                 isFlappyMode = true;
                 dinoY = SCREEN_HEIGHT / 2.0f;
                 velocityY = 0.0f;
                 obstacles.clear();
+                items.clear();
             } else if (isFlappyMode && obstacleCount == 10) {
                 gameWon = true;
             }
@@ -143,14 +180,14 @@ void update(float deltaTime) {
 
     for (auto& obs : obstacles) {
         int dinoLeft = 100;
-        int dinoRight = 100 + static_cast<int>(DINO_WIDTH * SCALE_FACTOR);
-        int dinoTop = static_cast<int>(dinoY) - static_cast<int>(DINO_HEIGHT * SCALE_FACTOR);
+        int dinoRight = 100 + static_cast<int>(dinoWidth);
+        int dinoTop = static_cast<int>(dinoY) - static_cast<int>(dinoHeight);
         int dinoBottom = static_cast<int>(dinoY);
 
         if (!isFlappyMode) {
             int obsLeft = static_cast<int>(obs.x);
-            int obsRight = obsLeft + static_cast<int>(obs.width * SCALE_FACTOR);
-            int obsTop = GROUND_LEVEL - static_cast<int>(obs.height * SCALE_FACTOR);
+            int obsRight = obsLeft + obs.width;
+            int obsTop = GROUND_LEVEL - obs.height;
             int obsBottom = GROUND_LEVEL;
 
             if (dinoRight > obsLeft && dinoLeft < obsRight && dinoBottom > obsTop && dinoTop < obsBottom) {
@@ -160,10 +197,35 @@ void update(float deltaTime) {
             int topPipeBottom = obs.gapY;
             int bottomPipeTop = obs.gapY + obs.gapHeight;
             int obsLeft = static_cast<int>(obs.x);
-            int obsRight = obsLeft + static_cast<int>(obs.width * SCALE_FACTOR);
+            int obsRight = obsLeft + obs.width;
 
             if (dinoRight > obsLeft && dinoLeft < obsRight && (dinoTop < topPipeBottom || dinoBottom > bottomPipeTop)) {
                 gameOver = true;
+            }
+        }
+    }
+
+    for (auto& item : items) {
+        if (item.collected) continue;
+
+        int dinoLeft = 100;
+        int dinoRight = 100 + static_cast<int>(dinoWidth);
+        int dinoTop = static_cast<int>(dinoY) - static_cast<int>(dinoHeight);
+        int dinoBottom = static_cast<int>(dinoY);
+
+        int itemLeft = static_cast<int>(item.x);
+        int itemRight = itemLeft + item.width;
+        int itemTop = item.y;
+        int itemBottom = item.y + item.height;
+
+        if (dinoRight > itemLeft && dinoLeft < itemRight && dinoBottom > itemTop && dinoTop < itemBottom) {
+            item.collected = true;
+            if (item.isGrow) {
+                dinoWidth *= 1.2f;
+                dinoHeight *= 1.2f;
+            } else {
+                dinoWidth /= 1.2f;
+                dinoHeight /= 1.2f;
             }
         }
     }
@@ -195,21 +257,27 @@ void render() {
     SDL_RenderCopy(renderer, backgroundTexture, NULL, &backgroundRect);
 
     if (!gameOver && !gameWon) {
-        SDL_Rect dinoRect = {100, static_cast<int>(dinoY) - static_cast<int>(DINO_HEIGHT * SCALE_FACTOR),
-                             static_cast<int>(DINO_WIDTH * SCALE_FACTOR), static_cast<int>(DINO_HEIGHT * SCALE_FACTOR)};
+        SDL_Rect dinoRect = {100, static_cast<int>(dinoY) - static_cast<int>(dinoHeight),
+                             static_cast<int>(dinoWidth), static_cast<int>(dinoHeight)};
         SDL_RenderCopy(renderer, dinoTextures[currentDinoFrame], NULL, &dinoRect);
 
         for (auto& obs : obstacles) {
             if (!isFlappyMode) {
-                SDL_Rect obsRect = {static_cast<int>(obs.x), GROUND_LEVEL - static_cast<int>(obs.height * SCALE_FACTOR),
-                                   static_cast<int>(obs.width * SCALE_FACTOR), static_cast<int>(obs.height * SCALE_FACTOR)};
+                SDL_Rect obsRect = {static_cast<int>(obs.x), GROUND_LEVEL - obs.height, obs.width, obs.height};
                 SDL_RenderCopy(renderer, obstacleTexture, NULL, &obsRect);
             } else {
-                SDL_Rect topPipe = {static_cast<int>(obs.x), 0, static_cast<int>(obs.width * SCALE_FACTOR), obs.gapY};
+                SDL_Rect topPipe = {static_cast<int>(obs.x), 0, obs.width, obs.gapY};
                 SDL_RenderCopy(renderer, flappyObstacleTexture, NULL, &topPipe);
                 SDL_Rect bottomPipe = {static_cast<int>(obs.x), obs.gapY + obs.gapHeight,
-                                       static_cast<int>(obs.width * SCALE_FACTOR), SCREEN_HEIGHT - (obs.gapY + obs.gapHeight)};
+                                       obs.width, SCREEN_HEIGHT - (obs.gapY + obs.gapHeight)};
                 SDL_RenderCopy(renderer, flappyObstacleTexture, NULL, &bottomPipe);
+            }
+        }
+
+        for (auto& item : items) {
+            if (!item.collected) {
+                SDL_Rect itemRect = {static_cast<int>(item.x) + 50, item.y + 50, item.width + 50, item.height +50};
+                SDL_RenderCopy(renderer, item.isGrow ? growItemTexture : shrinkItemTexture, NULL, &itemRect);
             }
         }
     }
@@ -238,6 +306,8 @@ void clean() {
     SDL_DestroyTexture(gameOverTexture);
     SDL_DestroyTexture(youWinTexture);
     SDL_DestroyTexture(backgroundTexture);
+    SDL_DestroyTexture(growItemTexture);
+    SDL_DestroyTexture(shrinkItemTexture);
     TTF_CloseFont(font);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
@@ -263,7 +333,7 @@ int main(int argc, char* argv[]) {
     obstacleTexture = loadTexture("C:\\DINASOURJUMP\\tree.png");
     if (!obstacleTexture) return 1;
 
-    flappyObstacleTexture = loadTexture("C:\\DINASOURJUMP\\pipe.png");
+    flappyObstacleTexture = loadTexture("C:\\DINASOURJUMP\\rock1.png");
     if (!flappyObstacleTexture) return 1;
 
     gameOverTexture = loadTexture("C:\\DINASOURJUMP\\gameover.png");
@@ -274,6 +344,12 @@ int main(int argc, char* argv[]) {
 
     backgroundTexture = loadTexture("C:\\DINASOURJUMP\\bg.png");
     if (!backgroundTexture) return 1;
+
+    growItemTexture = loadTexture("C:\\DINASOURJUMP\\grow.png");
+    if (!growItemTexture) return 1;
+
+    shrinkItemTexture = loadTexture("C:\\DINASOURJUMP\\shrink.png");
+    if (!shrinkItemTexture) return 1;
 
     font = TTF_OpenFont("arial.ttf", 24);
     if (!font) {
