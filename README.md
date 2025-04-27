@@ -1,6 +1,6 @@
 Vào năm 2120, khủng long đã được tái tạo lại và trở thành vật nuôi của con người. Trong lúc chơi đùa cùng khủng long, Andy đã bị lạc vào 1 khu rừng. Game theo chân Andy và chú khủng long vượt qua các chướng ngại vật để tìm đường về nhà. 
 
-How to play:
+HOW TO PLAY:
 
 Trong trò chơi DINOJUMP, nhấn space để nhảy khi gặp chướng ngại vật (Lưu ý: Nên nhảy khi đến gần chướng ngại vật). Ở trò chơi 2 - FLAPPY DINO , nhấn space liên tục để k bị rơi xuống, khi khủng long chạm đất sẽ thua. 
 
@@ -21,6 +21,24 @@ Game FLAPPY DINA sử dụng logic tương tự, sự khác biệt là thay vì 
 Cơ chế va chạm được tham khảo từ video https://www.youtube.com/watch?v=c_6qEdSAw8Y .
 
 5.Cơ chế vật phẩm tăng giảm kích thước của khủng long, xuất hiện 1 lần sau khi obstacles = 3, tỷ lệ xuất hiện 1 trong 2 vật phẩm to nhỏ là 50%. Các kích thước chướng ngại vật giữ nguyên => nếu may mắn ăn được cục vật phẩm thu nhỏ trò chơi sẽ dễ dàng hơn và ngược lại.
+
+ĐỒ HỌA GAME:
+
+Hình ảnh khủng long 
+
+![dina1](https://github.com/user-attachments/assets/f99f3d40-17c7-4e3d-980c-ba235edc9434)
+
+Background game 
+
+![bg](https://github.com/user-attachments/assets/f026b77f-57c8-4a79-8035-8972ed675bc7) 
+
+Hình ảnh cây ở game 1 
+
+![tree](https://github.com/user-attachments/assets/bf463463-b8dc-45f3-bcd9-0d83eec351f9) 
+
+Hình ảnh cục đá ở game 2
+
+![rock1](https://github.com/user-attachments/assets/af40e3ac-f332-49c9-bc49-27640dea523f) 
 
 UPDATE:
 
