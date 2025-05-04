@@ -1,3 +1,5 @@
+Video giới thiệu game: https://youtu.be/F6WYeYYBl3s
+
 Vào năm 2120, khủng long đã được tái tạo lại và trở thành vật nuôi của con người. Trong lúc chơi đùa cùng khủng long, Andy đã bị lạc vào 1 khu rừng. Game theo chân Andy và chú khủng long vượt qua các chướng ngại vật để tìm đường về nhà. 
 
 HOW TO PLAY:
